@@ -14,7 +14,7 @@ Plugin for storing meta for post revisions
 
 	register_post_type('post-type', $args);
 	```
-- create metabox for post type with fields which names that match the meta keys
+- create metabox for post type with fields which names match the meta keys
 
 	```html
 	<input type="text" name="first_meta_key" />
