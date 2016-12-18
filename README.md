@@ -1,5 +1,5 @@
 # Revision Meta
-Plugin for storing meta for post revisions
+WordPress plugin for storing meta with post revisions
 
 # Usage
 - register post type with `revision_meta` key and `revision` support or use `revision_meta_fields` filter for already registered post types

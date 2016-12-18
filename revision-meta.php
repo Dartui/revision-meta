@@ -1,6 +1,6 @@
 <?php
 /* Plugin Name: Revision Meta
- * Plugin Description: Plugin for storing meta for post revisions
+ * Plugin Description: Plugin for storing meta with post revisions
  * Version: 1.0
  * Author: Krzysztof Grabania
  * Author URI: http://grabania.pl/
