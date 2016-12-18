@@ -6,6 +6,10 @@
  * Author URI: http://grabania.pl/
  */
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class RevisionMeta {
 	public function __construct() {
 		add_filter('wp_save_post_revision_post_has_changed', array($this, 'save_post_revision'), 10, 3);
