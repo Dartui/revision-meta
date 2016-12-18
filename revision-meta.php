@@ -78,10 +78,18 @@ class RevisionMeta {
 		}
 
 		if (!empty($object->revision_meta) && is_array($object->revision_meta)) {
-			return $object->revision_meta;
+			$meta_fields = $object->revision_meta;
+		} else {
+			$meta_fields = array();
 		}
 
-		return false;
+		$meta_fields = array_filter(apply_filters('revision_meta_fields', $meta_fields, $object->post_type, $object));
+
+		if (empty($meta_fields)) {
+			return false;
+		}
+
+		return $meta_fields;
 	}
 
 	private function meta_has_changed($old = array(), $new = array()) {
