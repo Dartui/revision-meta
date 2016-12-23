@@ -15,6 +15,7 @@ class RevisionMeta {
 		add_filter('wp_save_post_revision_post_has_changed', array($this, 'save_post_revision'), 10, 3);
 		add_action('_wp_put_post_revision', array($this, 'put_post_revision'), 10, 1);
 		add_action('wp_restore_post_revision', array($this, 'restore_post_revision'), 10, 2);
+		add_action('wp_delete_post_revision', array($this, 'delete_post_revision'), 10, 2);
 	}
 
 	public function save_post_revision($post_is_changed, $last_revision, $post) {
@@ -56,6 +57,14 @@ class RevisionMeta {
 				if ($revision = get_post_meta($revision_id, $meta_key, true)) {
 					update_post_meta($post_id, $meta_key, $revision);
 				}
+			}
+		}
+	}
+	
+	public function delete_post_revision($revision_id, $revision) {
+		if ($revision_meta = $this->get_revision_meta_fields($revision_id)) {
+			foreach ($revision_meta as $meta_key) {
+				delete_metadata('post', $revision_id, $meta_key);
 			}
 		}
 	}
