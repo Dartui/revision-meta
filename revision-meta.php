@@ -1,7 +1,7 @@
 <?php
 /* Plugin Name: Revision Meta
  * Plugin Description: Plugin for storing meta with post revisions
- * Version: 1.0
+ * Version: 1.0.1
  * Author: Krzysztof Grabania
  * Author URI: http://grabania.pl/
  */
@@ -23,16 +23,14 @@ class RevisionMeta {
 			return $post_is_changed;
 		}
 
-		// get all meta
-		$last_revision_meta = get_post_meta($last_revision->ID);
-
 		$old_meta = array();
 		$new_meta = array();
 		foreach ($revision_meta as $meta_key) {
-			$new_meta[$meta_key] = isset($_POST[$meta_key]) ? $_POST[$meta_key] : '';
-
-			$last_revision_meta_value = isset($last_revision_meta[$meta_key]) ? $last_revision_meta[$meta_key][0] : '';
-			$old_meta[$meta_key]      = maybe_unserialize($last_revision_meta_value);
+			$last_revision_value = get_post_meta($last_revision->ID, $meta_key, true);
+			$post_revision_value = filter_input(INPUT_POST, $meta_key);
+			
+			$new_meta[$meta_key] = $post_revision_value ? $post_revision_value : '';
+			$old_meta[$meta_key] = $last_revision_value ? $last_revision_value : '';
 		}
 
 		return $this->meta_has_changed($old_meta, $new_meta) || $post_is_changed;
@@ -42,8 +40,10 @@ class RevisionMeta {
 	public function put_post_revision($revision_id) {
 		if ($revision_meta = $this->get_revision_meta_fields($revision_id)) {
 			foreach ($revision_meta as $meta_key) {
-				if (isset($_POST[$meta_key])) {
-					update_metadata('post', $revision_id, $meta_key, $_POST[$meta_key]);
+				$meta_value = filter_input(INPUT_POST, $meta_key);
+				
+				if ($meta_value) {
+					update_metadata('post', $revision_id, $meta_key, $meta_value);
 				} else {
 					delete_metadata('post', $revision_id, $meta_key);
 				}
@@ -61,7 +61,7 @@ class RevisionMeta {
 		}
 	}
 	
-	public function delete_post_revision($revision_id, $revision) {
+	public function delete_post_revision($revision_id) {
 		if ($revision_meta = $this->get_revision_meta_fields($revision_id)) {
 			foreach ($revision_meta as $meta_key) {
 				delete_metadata('post', $revision_id, $meta_key);
