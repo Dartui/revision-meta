@@ -42,13 +42,17 @@ class RevisionMeta {
 			foreach ($revision_meta as $meta_key) {
 				$meta_value = filter_input(INPUT_POST, $meta_key);
 				
-				if ($meta_value) {
-					update_metadata('post', $revision_id, $meta_key, $meta_value);
-				} else {
-					delete_metadata('post', $revision_id, $meta_key);
-				}
+				$this->update_or_delete($revision_id, $meta_key, $meta_value);
 			}
 		}
+	}
+	
+	private function update_or_delete($revision_id, $meta_key, $meta_value) {
+		if ($meta_value) {
+			return update_metadata('post', $revision_id, $meta_key, $meta_value);
+		}
+		
+		return delete_metadata('post', $revision_id, $meta_key);
 	}
 
 	public function restore_post_revision($post_id, $revision_id) {
@@ -81,19 +85,17 @@ class RevisionMeta {
 		return get_post_type_object($post_type_name);
 	}
 
-	private function get_revision_meta_fields($the_object = false) {
-		if (!$the_object) {
+	private function get_revision_meta_fields($the_object) {
+		$object = $this->get_object($the_object);
+		
+		if (!$object) {
 			return false;
-		} elseif (is_numeric($the_object)) {
-			$object = $this->get_post_type($the_object);
-		} else {
-			$object = $the_object;
 		}
+		
+		$meta_fields = array();
 
 		if (!empty($object->revision_meta) && is_array($object->revision_meta)) {
 			$meta_fields = $object->revision_meta;
-		} else {
-			$meta_fields = array();
 		}
 
 		$meta_fields = array_filter(apply_filters('revision_meta_fields', $meta_fields, $object->post_type, $object));
@@ -103,6 +105,18 @@ class RevisionMeta {
 		}
 
 		return $meta_fields;
+	}
+	
+	private function get_object($the_object) {
+		if (!$the_object) {
+			return false;
+		}
+		
+		if (is_numeric($the_object)) {
+			return $this->get_post_type($the_object);
+		}
+		
+		return $the_object;
 	}
 
 	private function meta_has_changed($old = array(), $new = array()) {
